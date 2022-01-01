@@ -10,7 +10,9 @@ class self_attention(nn.Module):
         super().__init__()
         self.attention=nn.MultiheadAttention(5,5)
     def forward(self,x):
+        x_res=x
         x=self.attention(x,x,x)
+        x=x_res+x[0]
         return x[0]
 
 class simple(nn.Module):
@@ -20,6 +22,7 @@ class simple(nn.Module):
         self.attention=nn.Sequential(*[self_attention()]*attention_layer)
         self.channel_FC=nn.Conv1d(5,1,kernel_size=1)
         self.time_FC=nn.Conv1d(96,24,kernel_size=1)
+        self.relu=nn.LeakyReLU(inplace=True)
         
 
     def forward(self,x): # x [b,c,t]
@@ -29,6 +32,7 @@ class simple(nn.Module):
         x=self.channel_FC(x) # [b,c1,t]
         x=x.permute(0,2,1)
         x=self.time_FC(x) # [b,t,c]
+        x=self.relu(x)
 
         return x.permute(0,2,1) #[b,c,t]
 
