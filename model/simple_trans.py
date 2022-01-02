@@ -38,7 +38,7 @@ class simple(nn.Module):
 
 if __name__ == '__main__':
     m=simple()
-    b,t,c=3,96,5
+    b,t,c=3,96,5 # 四条协变量+一条0-1 1用于标注当前为上班时间 长度也为96(24*4)
     x=torch.rand((b,c,t))
     
     y=m(x)
