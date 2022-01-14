@@ -4,8 +4,11 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 
 
-def read_test_csv():
-    csv_file = open('./test/CoolingLoad7days.csv', 'r', encoding='utf-8', newline='')
+def read_test_csv(test_csv=None):
+    if test_csv:
+        csv_file = open('./data/CoolingLoad7days.csv', 'r', encoding='utf-8', newline='')
+    else:
+        csv_file = open('./data/CoolingLoad7days.csv', 'r', encoding='utf-8', newline='')
     csv_reader_lines = csv.reader(csv_file)
     a = []
     number = 0
@@ -91,8 +94,11 @@ def insert_times_and_reshape(result):
     return final_result
 
 
-def insert_prototype(a):
-    prototype18 = np.load("./data/prototype18.npy")
+def insert_prototype(a,prototype18=None):
+    if prototype18:
+        pass
+    else:
+        prototype18 = np.load("./data/prototype18.npy")
     for i in range(a.shape[0]):
         a[i, :, 8] = prototype18[int(a[i, 0, 9])].repeat(4)
         if (('2020' in a[i, 0, 0]) and (
@@ -103,16 +109,63 @@ def insert_prototype(a):
     return a
 
 
-def test_data_preprocessing():
+def test_data_preprocessing(prototype):
     s = read_test_csv()
     # result = imputed_zero_average(s)
     result = imputed_below_zero(s)
     final = insert_times_and_reshape(result)
-    a = insert_prototype(final)
+    a = insert_prototype(final,prototype)
     np.save("test_model.npy", a)
     x = np.load("test_model.npy")
     print(x.shape)
     return a
+
+def get_day_index(years,dayofweek,dates):
+    day_list = [[] for i in range(7)]
+    for day in [0,1,2,3,4,5,6]:
+        for i,(year,dow,date) in enumerate(zip(years,dayofweek,dates)):
+            holiday = (int(year[0][:4]) == 2020 and int(date[0]) in [1,25,27,28,95,101,102,104,121,122,177,183,275,276,360,361]) or  (int(year[0][:4]) ==2021 and int(date[0]) in [1,44,46,92,93,95,96,121,122,139,274,287,359,361])
+            # if int(year[0][:4]) == 2020 and int(date[0]) < 275:
+            #     continue
+            if day in [0,1,2,3,4,5]:
+                if int(dow[0]) == day and not holiday:
+                    day_list[day].append(i)
+            else:
+                if int(dow[0]) == 6 or holiday:
+                    day_list[day].append(i)
+    return day_list
+
+def skip_outliner(input,output):
+    select_list = []
+    target_list = []
+    for i, (data,target) in enumerate(zip(input,output)):
+        if int(data[0][0][:4]) == 2020 and int(data[0][10]) in [129,140,142,144,145,147,150,151,152,153,216,217]:
+            continue
+        if int(data[0][0][:4]) == 2021 and int(data[0][10]) in [8,11]:
+            continue
+        select_list.append(i)
+        target_list.append(i)
+    return input[select_list],output[select_list]
+    # np.save('input_no_outliner.npy',input[select_list])
+    # np.save('output_no_outliner.npy',output[select_list])
+
+def reassign_mean(input,output):
+    # draw_data(input,output,2021,43)
+    day_list = get_day_index(input[:,:,0],input[:,:,9],input[:,:,10])
+    prototype=[]
+    for i in range(7):
+        mean_flow = output[day_list[i]].mean(0)
+        # print(mean_flow)
+        mean_flow_4 = mean_flow.repeat(4)
+        # for data in mean_flow:
+        #     mean_flow_4 += [float(data),float(data),float(data),float(data)] 
+        input[day_list[i],:,8] = mean_flow_4
+        prototype.append(mean_flow)
+    # draw_data(input,output,2021,43)
+    
+    return input,output,prototype
+    np.save('input_no_outliner_fix_allmean.npy',input)
+
 
 
 def train_input_output():
@@ -155,7 +208,7 @@ def train_input_output():
     total_a = np.array(total_a)
 
     input_save = total_a[:, :, 0:11]
-    input_save = insert_prototype(input_save)
+    #input_save = insert_prototype(input_save)
 
     # np.save("input_18months_imputed.npy", input_save)
     # loaddata = np.load("input_18months_imputed.npy")
@@ -186,14 +239,23 @@ def train_input_output():
     # loaddata_2 = np.load("output_18months_imputed.npy")
     # print(loaddata_2.shape)
 
-    return input_save, output_save
+    input_save,output_save=skip_outliner(input_save,output_save)
+    input_save,output_save,prototype=reassign_mean(input_save,output_save)
+
+
+
+
+    return input_save, output_save,prototype
 
 
 
 if __name__=='__main__':
-    test_data = test_data_preprocessing()
-    print(test_data.shape)
-    train_input, train_output = train_input_output()
+    train_input, train_output, prototype = train_input_output()
     print(train_input.shape, train_output.shape)
+    input=np.load('data/input_no_outliner_fix_allmean.npy',allow_pickle=True)
+    print(train_input==input)
+    test_data = test_data_preprocessing(prototype)
+    print(test_data.shape)
+    
 
 
