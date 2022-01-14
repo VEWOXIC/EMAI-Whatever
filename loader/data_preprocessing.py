@@ -29,7 +29,24 @@ def read_train_csv():
         number = number + 1
     s = np.array(a)
     print(s.shape)
-    return s
+    
+    result_time = []
+    for each in s[1:s.shape[0], :]:
+        date = datetime.strptime(each[0], '%Y/%m/%d %H:%M')
+        x = date.timetuple().tm_yday
+        y = date.weekday()
+        month_day_year = str(date.strftime('%Y/%m/%d'))
+        hour_of_day = date.timetuple().tm_hour
+        min_of_hour = date.timetuple().tm_min
+        each = np.insert(each, 0, values=month_day_year, axis=0)
+        each = np.insert(each, 1, values=hour_of_day, axis=0)
+        each = np.insert(each, 2, values=min_of_hour, axis=0)
+        each = np.insert(each, 8, values=0, axis=0)
+        each = np.insert(each, 9, values=y, axis=0)
+        each = np.insert(each, 10, values=x, axis=0)
+        result_time.append(each.tolist())
+    result_time = np.array(result_time)
+    return result_time
 
 
 def imputed_zero_average(s):
