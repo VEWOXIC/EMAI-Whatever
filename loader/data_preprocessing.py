@@ -17,7 +17,7 @@ def read_test_csv():
 
 
 def read_train_csv():
-    csv_file = open('imputed_18months.csv', 'r', encoding='utf-8', newline='')
+    csv_file = open('./data/imputed_18months.csv', 'r', encoding='utf-8', newline='')
     csv_reader_lines = csv.reader(csv_file)
     a = []
     number = 0
@@ -92,7 +92,7 @@ def insert_times_and_reshape(result):
 
 
 def insert_prototype(a):
-    prototype18 = np.load("prototype18.npy")
+    prototype18 = np.load("./data/prototype18.npy")
     for i in range(a.shape[0]):
         a[i, :, 8] = prototype18[int(a[i, 0, 9])].repeat(4)
         if (('2020' in a[i, 0, 0]) and (
