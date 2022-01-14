@@ -88,7 +88,7 @@ class experiment(object):
                 loc = list(loc[0])
                 loc = [int(_) for _ in loc]
                 self.SCI_Imputation.load_state_dict(torch.load('./checkpoints/tem_impute_S_L1.model'))
-                T[np.isnan(T)] = 0.0
+                T[loc] = 0.0
                 T_i = torch.from_numpy(T)
                 T_i = T_i.unsqueeze(0)  # 1,96,4
                 T_i = T_i.float().cuda()
@@ -105,7 +105,7 @@ class experiment(object):
                 loc = list(loc[0])
                 loc = [int(_) for _ in loc]
                 self.SCI_Imputation.load_state_dict(torch.load('./checkpoints/hum_impute_S_L1.model'))
-                H[np.isnan(H)] = 0.0
+                H[loc] = 0.0
                 H_i = torch.from_numpy(H)
                 H_i = H_i.unsqueeze(0)  # 1,96,4
                 H_i = H_i.float().cuda()
@@ -122,7 +122,7 @@ class experiment(object):
                 loc = list(loc[0])
                 loc = [int(_) for _ in loc]
                 self.SCI_Imputation.load_state_dict(torch.load('./checkpoints/uv_impute_S_L1.model'))
-                U[np.isnan(U)] = 0.0
+                U[loc] = 0.0
                 U_i = torch.from_numpy(U)
                 U_i = U_i.unsqueeze(0)  # 1,96,4
                 U_i = U_i.float().cuda()
@@ -139,7 +139,7 @@ class experiment(object):
                 loc = list(loc[0])
                 loc = [int(_) for _ in loc]
                 self.SCI_Imputation.load_state_dict(torch.load('./checkpoints/af_impute_S_L1.model'))
-                A[np.isnan(A)] = 0.0
+                A[loc] = 0.0
                 A_i = torch.from_numpy(A)
                 A_i = A_i.unsqueeze(0)  # 1,96,4
                 A_i = A_i.float().cuda()
