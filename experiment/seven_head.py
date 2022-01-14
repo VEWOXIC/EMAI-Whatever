@@ -52,6 +52,7 @@ class experiment(object):
     def _get_data(self,tt_ratio):
         # data 1: no outliner, no wrong holiday 
         input=np.load('data/input_no_outliner_fix.npy',allow_pickle=True)
+        # input=np.load('data/input_no_outliner_fix_allmean.npy',allow_pickle=True) # 和上面那个不知道哪个更好,仅是prototype计算方式不同
         output=np.load('data/output_no_outliner_fix.npy',allow_pickle=True)
 
         # data 2: has outliner, no wrong holiday
