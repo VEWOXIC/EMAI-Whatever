@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 #import pandas as pd
 from sklearn.model_selection import train_test_split
+from loader.data_preprocessing import test_data_preprocessing, train_input_output
 
 import argparse 
 def parse_args():
@@ -60,8 +61,9 @@ class experiment(object):
         output=np.load('data/output_fix.npy',allow_pickle=True)
 
         # data 3: has outliner, wrong holiday 
-        input=np.load('data/input_18month_imputed_18prototype.npy',allow_pickle=True)
-        output=np.load('./data/output_18month_imputed.npy',allow_pickle=True)
+        input, output = train_input_output()
+        # input = np.load('data/input_18month_imputed_18prototype.npy', allow_pickle=True)
+        # output = np.load('./data/output_18month_imputed.npy', allow_pickle=True)
         
         day_list = self.get_index(input[:,:,0],input[:,:,9],input[:,:,10])
         input = input[day_list[self.day]]
@@ -195,11 +197,10 @@ class experiment(object):
         for i in range(7):
             models[i].load_state_dict(torch.load('./checkpoints/day{}.{}'.format(i,args.model_name)))
             models[i].cuda()
-        test_set=np.load('./data/test_model.npy',allow_pickle=True)
+        
+        test_set = test_data_preprocessing()
+        #test_set = np.load('./data/test_model.npy', allow_pickle=True)
 
-        # New data
-        day_list = self.get_index(test_set[:,:,0],test_set[:,:,7],test_set[:,:,6])
-        test_input=test_set[:,:,1:6].astype(float)
 
         # Old data
         # day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
