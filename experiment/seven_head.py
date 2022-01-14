@@ -355,13 +355,13 @@ class experiment(object):
                 self.model = models[i]
                 batch, mse, l1 = self.validate_a_day()
 
-        print('Batch:',batch_total, 'Test mse: '+str(mse_total.item()*self.out_scale/batch_total)+' mae: '+str(l1_total.item()*self.out_scale/batch_total))
+        print('Batch:',batch_total, 'Test mse: '+str(mse_total*self.out_scale/batch_total)+' mae: '+str(l1_total*self.out_scale/batch_total))
 
-    def test(self):
+    def test(self,test_csv):
         with torch.no_grad():
             # Only support ensemble
             # test_set=np.load('./data/test_data.npy',allow_pickle=True)
-            test_set = test_data_preprocessing(self.prototype)
+            test_set = test_data_preprocessing(self.prototype,test_csv)
             day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
             test_input=test_set[:,:,4:9].astype(np.float)
             info=test_set[:,0,[9,10]]
@@ -383,7 +383,7 @@ class experiment(object):
                     fore_output[day_list[day]] = fore
             df=pd.DataFrame({'Timestamp':test_set[:,::4,3].flatten(),'CoolingLoad':fore_output.flatten().cpu().detach().numpy()})
             df.to_csv('./A-P10005_output.csv',index=False,sep=',')
-            
+
 
             #print(fore_output)
             # print(fore_output)
