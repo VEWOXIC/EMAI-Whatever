@@ -7,7 +7,7 @@ output_path = './data'
 # working directory
 working_path = './'
 # Names of training and testing data sets provided in this competition
-training_csv = "imputed_18months.csv"
+training_csv = "CoolingLoad18months.csv"
 testing_csv = "CoolingLoad7days.csv"
 # Names of your team's cooling load prediction model and the prediction output
 YourTeamName_finalmodel = "./final_checkpoints/"
