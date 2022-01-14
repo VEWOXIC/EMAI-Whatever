@@ -26,7 +26,8 @@ if __name__=='__main__':
     torch.backends.cudnn.deterministic = True  # Can change it to False --> default: False
     torch.backends.cudnn.enabled = True
     exp=experiment()
-    exp.train()
-    exp.validate()
+    # exp.train()
+    # exp.validate()
+    exp.test_last7days()
     # exp.test()
     # exp.cross_validation()
