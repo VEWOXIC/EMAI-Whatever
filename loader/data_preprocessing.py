@@ -73,7 +73,7 @@ def insert_times_and_reshape(result):
         each = np.insert(each, 0, values=month_day_year, axis=0)
         each = np.insert(each, 1, values=hour_of_day, axis=0)
         each = np.insert(each, 2, values=min_of_hour, axis=0)
-        each = np.insert(each, 5, values=0, axis=0)
+        each = np.insert(each, 8, values=0, axis=0)
         each = np.insert(each, 9, values=y, axis=0)
         each = np.insert(each, 10, values=x, axis=0)
         result_time.append(each.tolist())
