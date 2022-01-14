@@ -1,7 +1,7 @@
 from model.multiscale import multiscale
 import torch
 import numpy as np
-from loader.dataloader import d_set
+from loader.dataloader import h_set
 from torch.utils.data import DataLoader
 from torch import nn
 from torch.nn import functional as F
@@ -28,8 +28,8 @@ class experiment(object):
         train_output=output[:int(l*tt_ratio)]
         test_input=input[int(l*tt_ratio):]
         test_output=output[int(l*tt_ratio):]
-        self.train_set=d_set(train_input,train_output)
-        self.test_set=d_set(test_input,test_output)
+        self.train_set=h_set(train_input,train_output)
+        self.test_set=h_set(test_input,test_output)
         self.train_loader=DataLoader(self.train_set,batch_size=self.batch_size,shuffle=True)
         self.test_loader=DataLoader(self.test_set,batch_size=self.batch_size,shuffle=False)
 
@@ -60,7 +60,7 @@ class experiment(object):
                 fore=fore.squeeze()
                 target=target.squeeze()
                 #print(fore,target)
-                loss=lossf(fore,target)
+                loss=torch.sqrt(lossf(fore,target))
 
                 loss.backward()
                 my_optim.step()
@@ -85,7 +85,7 @@ class experiment(object):
                     fore=self.model(hod.unsqueeze(dim=-1).to(torch.float32),dow.unsqueeze(dim=-1).to(torch.float32),woy.unsqueeze(dim=-1).to(torch.float32),co)
                     fore=fore.squeeze()
                     target=target.squeeze()
-                    loss=lossf(fore,target)
+                    loss=torch.sqrt(lossf(fore,target))
                     t_loss+=loss
                 print('Test loss: '+str(t_loss/i))
 
@@ -112,13 +112,17 @@ class experiment(object):
             t_loss=0
             for i,(input,target) in enumerate(self.test_loader):
                 input=input.cuda()
+                co=input[:,0:4]
+                woy=F.one_hot(input[:,4,3].to(torch.int64),num_classes=52)
+                dow=F.one_hot(input[:,4,1].to(torch.int64),num_classes=7)
+                hod=F.one_hot(input[:,4,0].to(torch.int64),num_classes=24)
                 target=target.cuda()
-                fore=self.model(input)
+                fore=self.model(hod.unsqueeze(dim=-1).to(torch.float32),dow.unsqueeze(dim=-1).to(torch.float32),woy.unsqueeze(dim=-1).to(torch.float32),co)
                 fore=fore.squeeze()
                 target=target.squeeze()
-                loss=lossf(fore,target)
+                loss=torch.sqrt(lossf(fore,target))
                 t_loss+=loss
-                #print(fore, target)
+                print(fore,target)
             print('Test loss: '+str(t_loss/i))
 
 

@@ -1,7 +1,7 @@
 from model.simple import simple
 import torch
 import numpy as np
-from loader.dataloader import d_set
+from loader.dataloader import h_set
 from torch.utils.data import DataLoader
 from torch import nn
 #import pandas as pd
@@ -27,8 +27,8 @@ class experiment(object):
         train_output=output[:int(l*tt_ratio)]
         test_input=input[int(l*tt_ratio):]
         test_output=output[int(l*tt_ratio):]
-        self.train_set=d_set(train_input,train_output)
-        self.test_set=d_set(test_input,test_output)
+        self.train_set=h_set(train_input,train_output)
+        self.test_set=h_set(test_input,test_output)
         self.train_loader=DataLoader(self.train_set,batch_size=self.batch_size,shuffle=True)
         self.test_loader=DataLoader(self.test_set,batch_size=self.batch_size,shuffle=False)
 
@@ -55,7 +55,7 @@ class experiment(object):
                 fore=fore.squeeze()
                 target=target.squeeze()
                 #print(fore,target)
-                loss=lossf(fore,target)
+                loss=torch.sqrt(lossf(fore,target))
 
                 loss.backward()
                 my_optim.step()
@@ -76,7 +76,7 @@ class experiment(object):
                     fore=self.model(input)
                     fore=fore.squeeze()
                     target=target.squeeze()
-                    loss=lossf(fore,target)
+                    loss=torch.sqrt(lossf(fore,target))
                     t_loss+=loss
                 print('Test loss: '+str(t_loss/i))
 
@@ -93,7 +93,7 @@ class experiment(object):
                 target=target.squeeze()
                 loss=lossf(fore,target)
                 t_loss+=loss
-                print(fore, target)
+                #print(fore, target)
             print('Test loss: '+str(t_loss/i))
 
 
