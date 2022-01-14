@@ -80,7 +80,7 @@ def insert_times_and_reshape(result):
     result = result[1:result.shape[0], :]
     result_time = []
     for each in result:
-        date = datetime.strptime(each[0], '%Y/%m/%d %H:%M')
+        date = datetime.strptime(each[0], '%Y-%m-%d %H:%M:%S')
         x = date.timetuple().tm_yday
         y = date.weekday()
         month_day_year = str(date.strftime('%Y/%m/%d'))
