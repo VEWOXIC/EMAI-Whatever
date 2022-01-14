@@ -10,14 +10,13 @@ working_path = './'
 training_csv = "imputed_18months.csv"
 testing_csv = "CoolingLoad7days.csv"
 # Names of your team's cooling load prediction model and the prediction output
-YourTeamName_finalmodel = "./checkpoints/"
-YourTeamName_output ="YourTeamName_output.csv"
+YourTeamName_finalmodel = "./final_checkpoints/"
+YourTeamName_output ="A-P10005_output.csv"
 training_data = os.path.join(input_path,training_csv)
 testing_data = os.path.join(input_path,testing_csv)
 predictor_model = os.path.join(output_path,YourTeamName_finalmodel)
 predictor_csv = os.path.join(output_path,YourTeamName_output)
 
-from model.simple import simple
 import torch
 import numpy as np
 #from experiment.exp import experiment
@@ -43,7 +42,7 @@ if __name__=='__main__':
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True  # Can change it to False --> default: False
     torch.backends.cudnn.enabled = True
-    exp=experiment()
+    exp=experiment(training_data)
     # exp.train()
     # exp.validate()
     exp.test(testing_data)
