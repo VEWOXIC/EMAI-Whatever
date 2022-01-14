@@ -1,44 +1,10 @@
-# EMAI Team: xxxx
+# EMAI Team: A-P10005
 
 # How to train: 
+run `python A-P10005_finaltraining.py` to train. Note that this only trains a single model. To validate on a single model, please add `--ensemble` after this command. 
 
 # How to test: 
-
-
-sevenhead 
-data1 allmean: 
-Day:6   batch: 1 Test mse: 132.9287109375 mae: 104.46768188476562
-Day:0   batch: 1 Test mse: 381.8780517578125 mae: 240.216064453125
-Day:1   batch: 1 Test mse: 294.6177062988281 mae: 187.40440368652344
-Day:2   batch: 1 Test mse: 199.2940216064453 mae: 149.88064575195312
-Day:3   batch: 1 Test mse: 186.33860778808594 mae: 147.05848693847656
-Day:4   batch: 1 Test mse: 302.3757019042969 mae: 195.7852783203125
-Day:5   batch: 1 Test mse: 119.4089584350586 mae: 88.58618927001953
-Day:6   batch: 1 Test mse: 132.9287109375 mae: 104.46768188476562
-Batch: 7 Test mse: 230.97738211495536 mae: 159.05695452008928
-
-data1 yearmean
-Test loss: 293.5111083984375l1: 235.12188720703125
-Day:6   batch: 1 Test mse: 151.60899353027344 mae: 103.70503234863281
-Day:0   batch: 1 Test mse: 399.9649353027344 mae: 250.54368591308594
-Day:1   batch: 1 Test mse: 346.8486328125 mae: 216.62411499023438
-Day:2   batch: 1 Test mse: 220.51272583007812 mae: 168.255615234375
-Day:3   batch: 1 Test mse: 192.13510131835938 mae: 150.9227752685547
-Day:4   batch: 1 Test mse: 290.6869201660156 mae: 196.03318786621094
-Day:5   batch: 1 Test mse: 135.12916564941406 mae: 97.25221252441406
-Day:6   batch: 1 Test mse: 151.60899353027344 mae: 103.70503234863281
-Batch: 7 Test mse: 248.12663922991072 mae: 169.048095703125
-
-data 2
-Day:6   batch: 1 Test mse: 223.9591064453125 mae: 178.08900451660156
-Day:0   batch: 1 Test mse: 255.66285705566406 mae: 188.667724609375
-Day:1   batch: 1 Test mse: 246.4546356201172 mae: 180.97100830078125
-Day:2   batch: 1 Test mse: 198.8710174560547 mae: 153.31536865234375
-Day:3   batch: 1 Test mse: 240.26101684570312 mae: 162.68788146972656
-Day:4   batch: 1 Test mse: 236.76478576660156 mae: 178.9697723388672
-Day:5   batch: 1 Test mse: 140.5545654296875 mae: 107.03743743896484
-Day:6   batch: 1 Test mse: 223.9591064453125 mae: 178.08900451660156
-Batch: 7 Test mse: 220.36113630022322 mae: 164.24830845424108
+run `python A-P10005_finaltesting.py`. This is tested on ensembled model. 
 
 
 
