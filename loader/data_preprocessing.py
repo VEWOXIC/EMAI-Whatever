@@ -72,11 +72,7 @@ def imputed_below_zero(s):
     for i in range(1, s.shape[0]):
         for j in range(1, s.shape[1]):
             if s[i][j] == '':
-                continue
-            else:
-                temp = float(s[i][j])
-                if temp < 0:
-                    s[i][j] = ''
+                s[i][j] = '-1'
     return s
 
 
