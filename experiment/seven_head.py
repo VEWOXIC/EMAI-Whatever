@@ -6,7 +6,8 @@ from torch.utils.data import DataLoader
 from torch import nn
 #import pandas as pd
 from sklearn.model_selection import train_test_split
-from loader.data_preprocessing import test_data_preprocessing, train_input_output
+
+from loader.data_preprocessing import *
 
 import argparse 
 def parse_args():
@@ -28,6 +29,7 @@ class experiment(object):
         self.batch_size=7 
         self.epochs=1000
         self.model = self._build_model().cuda()
+        input, output, self.prototype = train_input_output()
 
 
     def _build_model(self):
@@ -52,18 +54,24 @@ class experiment(object):
 
     def _get_data(self,tt_ratio):
         # data 1: no outliner, no wrong holiday 
-        input=np.load('data/input_no_outliner_fix.npy',allow_pickle=True)
-        # input=np.load('data/input_no_outliner_fix_allmean.npy',allow_pickle=True) # 和上面那个不知道哪个更好,仅是prototype计算方式不同
-        output=np.load('data/output_no_outliner_fix.npy',allow_pickle=True)
+        # input=np.load('data/input_no_outliner_fix.npy',allow_pickle=True)
+        # # print(input.shape)
+        # #input=np.load('data/input_no_outliner_fix_allmean.npy',allow_pickle=True)
+        # output=np.load('data/output_no_outliner_fix.npy',allow_pickle=True)
+
+        input, output, self.prototype = train_input_output()
+
+
 
         # data 2: has outliner, no wrong holiday
-        input=np.load('data/input_fix.npy',allow_pickle=True)
-        output=np.load('data/output_fix.npy',allow_pickle=True)
+        # input=np.load('data/input_fix.npy',allow_pickle=True)
+        # output=np.load('data/output_fix.npy',allow_pickle=True)
 
-        # data 3: has outliner, wrong holiday 
-        input, output = train_input_output()
-        # input = np.load('data/input_18month_imputed_18prototype.npy', allow_pickle=True)
-        # output = np.load('./data/output_18month_imputed.npy', allow_pickle=True)
+        # # data 3: has outliner, wrong holiday 
+        # input=np.load('data/input_18month_imputed_18prototype.npy',allow_pickle=True)
+        # output=np.load('./data/output_18month_imputed.npy',allow_pickle=True)
+
+
         
         day_list = self.get_index(input[:,:,0],input[:,:,9],input[:,:,10])
         input = input[day_list[self.day]]
@@ -195,12 +203,45 @@ class experiment(object):
     def test(self):
         models = [simple(args, 3,5) for i in range(7)]
         for i in range(7):
-            models[i].load_state_dict(torch.load('./checkpoints/day{}.{}'.format(i,args.model_name)))
+            models[i].load_state_dict(torch.load('./checkpoints/1day{}.{}'.format(i,args.model_name)))
             models[i].cuda()
-        
-        test_set = test_data_preprocessing()
-        #test_set = np.load('./data/test_model.npy', allow_pickle=True)
+        a_test_set=np.load('./data/test_data.npy',allow_pickle=True)
+        test_set = test_data_preprocessing(self.prototype)
+        #print(a_test_set[0,0],test_set[0,0])
 
+        # New data
+        day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
+        test_input=test_set[:,:,4:9].astype(float)
+
+        # Old data
+        # day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
+        # test_input=test_set[:,:,4:9].astype(np.float)
+
+        input=torch.from_numpy(test_input).type(torch.float).cuda()
+        input[:,:,4]=input[:,:,4]/50
+        input=input.permute(0,2,1)
+        fore_output=models[0](input)
+        fore_output=fore_output.squeeze()
+        for i in range(7):
+            if len(day_list[i]) != 0:
+                fore=models[i](input[day_list[i]])
+                fore=fore.squeeze()
+                fore_output[day_list[i]] = fore
+        print(fore_output)
+
+
+    def test_last7days(self):
+        models = [simple(args, 3,5) for i in range(7)]
+        for i in range(7):
+            models[i].load_state_dict(torch.load('./checkpoints/1day{}.{}'.format(i,args.model_name)))
+            models[i].cuda()
+        a_test_set=np.load('./data/test_data.npy',allow_pickle=True)
+        test_set = test_data_preprocessing(self.prototype)
+        #print(a_test_set[0,0],test_set[0,0])
+
+        # New data
+        day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
+        test_input=test_set[:,:,4:9].astype(float)
 
         # Old data
         # day_list = self.get_index(test_set[:,:,0],test_set[:,:,9],test_set[:,:,10])
@@ -217,7 +258,13 @@ class experiment(object):
                 fore=fore.squeeze()
                 fore_output[day_list[i]] = fore
 
-        print(fore_output)
+        output=np.load('data/output_no_outliner_fix.npy',allow_pickle=True)
+        target=torch.tensor(output[-7:]).cuda()
+        print(fore_output,target)
+        lossf=nn.MSELoss().cuda()
+        loss=torch.sqrt(lossf(fore_output,target))
+
+        print(loss)
 
 
 
