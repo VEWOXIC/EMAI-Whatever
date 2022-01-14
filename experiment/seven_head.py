@@ -384,13 +384,6 @@ class experiment(object):
             df=pd.DataFrame({'Timestamp':test_set[:,::4,3].flatten(),'CoolingLoad':fore_output.flatten().cpu().detach().numpy()})
             df.to_csv('./A-P10005_output.csv',index=False,sep=',')
             
-            output=np.load('data/output_no_outliner_fix.npy',allow_pickle=True)
-            target=torch.tensor(output[-7:]).cuda()
-            print(fore_output,target)
-            lossf=nn.MSELoss().cuda()
-            loss=torch.sqrt(lossf(fore_output.cuda(),target))
-
-            print(loss)
 
             #print(fore_output)
             # print(fore_output)
